@@ -4,6 +4,12 @@ This framework allows software engineering managers to have meaningful conversat
 
 Although the framework uses roles and levels that are somewhat standard in the US tech industry, every company is different. Please use the information provided as a baseline and feel free adjust it to your needs.
 
+## Static self-assessment extension
+
+This repository also contains a static `index.html` self-assessment page that extends the original Engineering Ladders material for the Developer track. It keeps the ladder definitions as the reference model, then adds an interactive radar chart, personal evidence notes, URL sharing, JSON import/export, print support, and a local PDF-CV import assistant.
+
+The extension is designed for GitHub Pages: it runs as static HTML, CSS, and JavaScript without a backend. PDF parsing happens locally in the browser with a vendored PDF.js build in `vendor/pdfjs`, and generated suggestions are heuristic review aids rather than an AI assessment.
+
 The framework relies heavily on radar charts to visually represent the different perspectives and expectations of a given position:
 
 <picture>

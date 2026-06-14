@@ -1,0 +1,2860 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Selbsteinsch&auml;tzung - Developer Model</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --accent: #d1003d;
+      --accent-soft: rgba(209, 0, 61, 0.1);
+      --accent-faint: rgba(209, 0, 61, 0.08);
+      --brand-purple: #1f0353;
+      --brand-purple-soft: #66527e;
+      --bg: #1f0353;
+      --surface: #f4f2f6;
+      --surface-2: #e9e5ed;
+      --chart-surface: #ffffff;
+      --field-bg: #ffffff;
+      --ink: #1f0353;
+      --page-ink: #ffffff;
+      --muted: #66527e;
+      --page-muted: #dfdae5;
+      --line: #c9c2d5;
+      --strong-line: #66527e;
+      --shadow: 0 30px 90px rgba(20, 0, 60, 0.28);
+      --radius: 8px;
+      font-family:
+        Muli, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scrollbar-color: var(--accent) var(--surface-2);
+      scrollbar-width: thin;
+    }
+
+    * {
+      scrollbar-color: var(--accent) var(--surface-2);
+      scrollbar-width: thin;
+    }
+
+    *::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: var(--surface-2);
+    }
+
+    *::-webkit-scrollbar-thumb {
+      border: 3px solid var(--surface-2);
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background: var(--brand-purple-soft);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: hidden;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px) 0 0 / 20% 100%,
+        var(--bg);
+      color: var(--page-ink);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    summary,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--page-ink);
+      min-height: 40px;
+      padding: 0 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    button:hover,
+    .more-actions-toggle:hover {
+      border-color: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    button:focus-visible,
+    .more-actions-toggle:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.86);
+      outline-offset: 2px;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .page-shell {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .topbar > * {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--page-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.85rem, 2.8vw, 2.8rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      color: var(--page-ink);
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 24px 0 0;
+      color: var(--page-muted);
+      font-size: 1rem;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .subtitle-heading {
+      margin: 0 0 8px;
+      color: var(--page-ink);
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .subtitle p {
+      margin: 0;
+    }
+
+    .toolbar {
+      display: grid;
+      justify-items: end;
+      gap: 8px;
+      min-width: 320px;
+    }
+
+    .toolbar-primary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .more-actions {
+      position: relative;
+    }
+
+    .more-actions-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--page-ink);
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    .more-actions-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .more-actions-toggle::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+    }
+
+    .more-actions[open] .more-actions-toggle {
+      border-color: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .more-actions[open] .more-actions-toggle::after {
+      transform: translateY(2px) rotate(225deg);
+    }
+
+    .more-actions-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 10;
+      display: grid;
+      gap: 6px;
+      width: min(220px, calc(100vw - 40px));
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .more-actions-menu button {
+      justify-content: flex-start;
+      width: 100%;
+      min-height: 36px;
+      border-color: var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .more-actions-menu button:hover {
+      border-color: var(--accent);
+      background: var(--surface-2);
+    }
+
+    .more-actions-menu .destructive {
+      border-color: rgba(255, 0, 76, 0.28);
+      color: var(--accent);
+    }
+
+    .help-dialog {
+      width: min(920px, calc(100vw - 32px));
+      max-height: min(840px, calc(100vh - 32px));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0;
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .help-dialog::backdrop {
+      background: rgba(31, 3, 83, 0.72);
+    }
+
+    .help-shell {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      max-height: inherit;
+    }
+
+    .help-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .help-kicker {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .help-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .help-close {
+      min-width: 38px;
+      min-height: 38px;
+      border-color: var(--line);
+      background: var(--accent-faint);
+      color: var(--accent);
+      font-size: 1.3rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .help-close:hover {
+      border-color: var(--accent);
+      background: rgba(209, 0, 61, 0.14);
+    }
+
+    .help-content {
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .help-section {
+      border-bottom: 1px solid var(--line);
+      padding: 0 0 18px;
+      margin: 0 0 18px;
+    }
+
+    .help-section:last-child {
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .help-section h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+
+    .help-section p,
+    .help-section li {
+      color: var(--ink);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .help-section p {
+      margin: 0 0 10px;
+    }
+
+    .help-section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .help-section a {
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .help-section code {
+      border-radius: 4px;
+      padding: 1px 5px;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 0.86em;
+    }
+
+    .help-levels {
+      display: grid;
+      gap: 10px;
+    }
+
+    .help-levels article {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: #ffffff;
+    }
+
+    .help-levels h4 {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 0.92rem;
+      line-height: 1.25;
+    }
+
+    .chart-dialog {
+      width: calc(100vw - 32px);
+      height: calc(100vh - 32px);
+      max-width: none;
+      max-height: none;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0;
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .chart-dialog::backdrop {
+      background: rgba(31, 3, 83, 0.82);
+    }
+
+    .chart-dialog-shell {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      height: 100%;
+    }
+
+    .chart-dialog-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .chart-dialog-title {
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.2;
+    }
+
+    .chart-dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .chart-dialog-close {
+      min-width: 38px;
+      padding: 0;
+      color: var(--accent);
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .chart-dialog-frame {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      margin: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--chart-surface);
+      overflow: hidden;
+    }
+
+    .chart-dialog-frame svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .action-status {
+      grid-column: 1 / -1;
+      height: 18px;
+      min-height: 18px;
+      overflow: hidden;
+      color: var(--page-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 18px;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      height: 100%;
+    }
+
+    .chart-panel {
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .chart-title {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .swatch {
+      width: 28px;
+      height: 3px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .swatch-self {
+      background: var(--accent);
+    }
+
+    .swatch-reference {
+      background: var(--strong-line);
+    }
+
+    .chart-actions {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chart-action-button,
+    .chart-dialog-action {
+      width: 38px;
+      min-width: 38px;
+      min-height: 38px;
+      padding: 0;
+      border-color: var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .chart-action-button svg,
+    .chart-dialog-action svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .chart-action-button:hover,
+    .chart-dialog-action:hover {
+      border-color: var(--accent);
+      background: var(--surface-2);
+    }
+
+    .chart-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1.2;
+      min-height: 430px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--chart-surface);
+    }
+
+    #radarChart {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .grid-ring {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 1.2;
+    }
+
+    .grid-ring.major {
+      stroke: var(--strong-line);
+      stroke-width: 1.4;
+    }
+
+    .axis-line {
+      stroke: var(--line);
+      stroke-width: 1;
+    }
+
+    .axis-label {
+      fill: var(--ink);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .level-label {
+      fill: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.86;
+    }
+
+    .selected-level-label {
+      fill: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      opacity: 1;
+      paint-order: stroke;
+      stroke: var(--chart-surface);
+      stroke-width: 5px;
+      stroke-linejoin: round;
+    }
+
+    .self-area {
+      fill: var(--accent-soft);
+      stroke: var(--accent);
+      stroke-width: 4;
+      stroke-linejoin: round;
+    }
+
+    .self-point {
+      fill: var(--surface);
+      stroke: var(--accent);
+      stroke-width: 3;
+    }
+
+    .controls-panel {
+      padding: 20px;
+    }
+
+    .profile-row {
+      display: grid;
+      grid-template-columns: 1fr 92px;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .text-input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--field-bg);
+      color: var(--ink);
+    }
+
+    .text-input {
+      min-height: 40px;
+      padding: 8px 10px;
+    }
+
+    textarea {
+      display: block;
+      min-height: 72px;
+      resize: vertical;
+      padding: 9px 10px;
+    }
+
+    .cv-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--chart-surface);
+      padding: 12px;
+      margin: 0 0 18px;
+    }
+
+    .cv-panel[hidden] {
+      display: none;
+    }
+
+    .cv-panel-topline {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .cv-panel-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 800;
+    }
+
+    .cv-file-name,
+    .cv-status,
+    .cv-count {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.38;
+      overflow-wrap: anywhere;
+    }
+
+    .cv-status {
+      color: var(--ink);
+    }
+
+    .cv-suggestions {
+      display: grid;
+      gap: 8px;
+      margin: 10px 0 12px;
+    }
+
+    .cv-suggestion {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      background: var(--surface);
+    }
+
+    .cv-suggestion-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .cv-confidence {
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .cv-term-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .cv-term-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 0;
+      padding: 5px 6px 5px 9px;
+      border-color: rgba(209, 0, 61, 0.22);
+      background: var(--accent-faint);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: left;
+    }
+
+    .cv-term-button:hover {
+      border-color: rgba(209, 0, 61, 0.54);
+      background: rgba(209, 0, 61, 0.14);
+    }
+
+    .cv-term-label {
+      overflow-wrap: anywhere;
+    }
+
+    .cv-term-remove {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(209, 0, 61, 0.1);
+      color: var(--accent);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .cv-empty-terms {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.38;
+    }
+
+    .cv-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cv-actions button {
+      border-color: var(--line);
+      background: var(--chart-surface);
+      color: var(--ink);
+    }
+
+    .cv-actions button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .cv-actions button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .axis-control {
+      border-top: 1px solid var(--line);
+      padding: 16px 0;
+    }
+
+    .axis-control:first-of-type {
+      border-top: 0;
+      padding-top: 2px;
+    }
+
+    .axis-topline {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .axis-name {
+      font-weight: 800;
+      font-size: 0.98rem;
+    }
+
+    .axis-level {
+      color: var(--accent);
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    output {
+      display: inline-grid;
+      place-items: center;
+      min-height: 34px;
+      border-radius: 6px;
+      background: var(--accent-faint);
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .scale {
+      display: flex;
+      justify-content: space-between;
+      margin-top: -4px;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .context {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .context-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: var(--chart-surface);
+      min-height: 138px;
+    }
+
+    .context-title {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .context-value {
+      margin: 0 0 8px;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .context-definition {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      line-height: 1.38;
+      overflow-wrap: anywhere;
+    }
+
+    .context-definition strong {
+      color: var(--accent);
+    }
+
+    .context-copy-label {
+      color: var(--accent);
+      font-size: inherit;
+      font-weight: 800;
+    }
+
+    .context-copy {
+      margin: 0;
+      max-height: 8.4rem;
+      overflow: auto;
+      padding-right: 4px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.38;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .source-band {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--page-muted);
+      font-size: 0.86rem;
+    }
+
+    .source-band a {
+      color: var(--page-ink);
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .footer-link-button {
+      display: inline;
+      min-height: 0;
+      min-width: 0;
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--page-ink);
+      font: inherit;
+      font-weight: 700;
+      text-decoration-line: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      vertical-align: baseline;
+    }
+
+    .footer-link-button:hover {
+      background: transparent;
+      color: #ffffff;
+      text-decoration-color: #ffffff;
+    }
+
+    .footer-link-button:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.86);
+      outline-offset: 3px;
+    }
+
+    .print-note {
+      display: none;
+    }
+
+    @media (max-width: 1040px) {
+      .topbar,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        display: grid;
+      }
+
+      .toolbar {
+        justify-content: start;
+        justify-items: start;
+      }
+
+      .toolbar-primary {
+        justify-content: flex-start;
+      }
+
+      .action-status {
+        text-align: left;
+      }
+
+      .workspace {
+        display: grid;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        padding: 14px 14px 40px;
+      }
+
+      .topbar {
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .eyebrow {
+        margin-bottom: 8px;
+        font-size: 0.72rem;
+      }
+
+      h1 {
+        font-size: 1.76rem;
+        line-height: 1.02;
+        max-width: min(100%, 360px);
+      }
+
+      .subtitle {
+        max-width: min(100%, 360px);
+        margin-top: 18px;
+        font-size: 0.96rem;
+        line-height: 1.48;
+      }
+
+      .subtitle-heading {
+        margin-bottom: 6px;
+      }
+
+      .chart-panel,
+      .controls-panel {
+        padding: 12px;
+      }
+
+      .chart-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .chart-title {
+        font-size: 0.96rem;
+      }
+
+      .legend {
+        justify-content: flex-start;
+        gap: 8px;
+        font-size: 0.78rem;
+      }
+
+      .legend-item {
+        white-space: normal;
+      }
+
+      .swatch {
+        width: 24px;
+      }
+
+      .chart-frame {
+        min-height: 0;
+        height: clamp(280px, 78vw, 340px);
+        aspect-ratio: auto;
+      }
+
+      .chart-actions {
+        right: 8px;
+        bottom: 8px;
+      }
+
+      .chart-action-button {
+        width: 36px;
+        min-width: 36px;
+        min-height: 36px;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        min-width: 0;
+        width: 100%;
+      }
+
+      .toolbar-primary {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 6px;
+        width: 100%;
+      }
+
+      .toolbar-primary > * {
+        min-width: 0;
+      }
+
+      .toolbar button,
+      .more-actions-toggle {
+        min-height: 38px;
+        width: 100%;
+        padding-inline: 8px;
+        font-size: 0.92rem;
+      }
+
+      .more-actions {
+        grid-column: 1 / -1;
+      }
+
+      .more-actions-toggle {
+        justify-content: center;
+      }
+
+      .more-actions-menu {
+        position: static;
+        width: auto;
+        margin-top: 8px;
+      }
+
+      .help-dialog {
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+      }
+
+      .help-header {
+        padding: 14px;
+      }
+
+      .help-content {
+        padding: 14px;
+      }
+
+      .chart-dialog {
+        width: calc(100vw - 20px);
+        height: calc(100vh - 20px);
+      }
+
+      .chart-dialog-header {
+        padding: 14px;
+      }
+
+      .chart-dialog-actions {
+        gap: 6px;
+      }
+
+      .chart-dialog-frame {
+        margin: 10px;
+      }
+
+      .action-status {
+        grid-column: 1 / -1;
+        height: auto;
+        min-height: 0;
+        line-height: 1.35;
+        white-space: normal;
+      }
+
+      .action-status:empty {
+        display: none;
+      }
+
+      .profile-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .workspace {
+        gap: 12px;
+      }
+
+      .context {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .context-item {
+        min-height: 0;
+        padding: 10px;
+      }
+
+      .context-title {
+        margin-bottom: 5px;
+      }
+
+      .context-value,
+      .context-definition {
+        margin-bottom: 6px;
+      }
+
+      .controls-panel {
+        margin-top: 0;
+      }
+
+      .axis-control {
+        padding: 14px 0;
+      }
+
+      .axis-control:first-of-type {
+        padding-top: 0;
+      }
+
+      .source-band {
+        margin-top: 16px;
+      }
+    }
+
+    @media print {
+      :root {
+        --bg: #ffffff;
+        --surface: #ffffff;
+        --surface-2: #ffffff;
+        --ink: #111827;
+        --muted: #5b6573;
+        --line: #ccd3dd;
+        --strong-line: #8d98a7;
+        --shadow: none;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .page-shell {
+        width: 100%;
+        padding: 0;
+      }
+
+      .toolbar,
+      .chart-actions,
+      .controls-panel,
+      .chart-dialog,
+      .help-dialog,
+      .source-band {
+        display: none;
+      }
+
+      .workspace {
+        display: block;
+      }
+
+      .panel {
+        border: 0;
+        box-shadow: none;
+      }
+
+      .chart-frame {
+        min-height: auto;
+        height: 650px;
+      }
+
+      .context {
+        break-inside: avoid;
+      }
+
+      .print-note {
+        display: block;
+        color: var(--muted);
+        margin: 14px 0 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Engineering Ladders / Developer Model</p>
+        <h1>Selbsteinsch&auml;tzung Developer Model</h1>
+        <div class="subtitle">
+          <h2 class="subtitle-heading">Spinnennetzdiagramm f&uuml;r das Interview:</h2>
+          <p>
+            Selbsteinsch&auml;tzung nach dem Developer-Modell
+            mit eigenen Belegen & Beispielen.
+          </p>
+        </div>
+      </div>
+      <div class="toolbar" aria-label="Aktionen">
+        <div class="toolbar-primary">
+          <button type="button" id="cvImportButton">CV importieren</button>
+          <button type="button" class="primary" id="shareButton">URL teilen</button>
+          <details class="more-actions" id="moreActions">
+            <summary class="more-actions-toggle" aria-label="Weitere Aktionen">Weitere</summary>
+            <div class="more-actions-menu">
+              <button type="button" id="printButton">Drucken</button>
+              <button type="button" id="exportButton">JSON exportieren</button>
+              <button type="button" id="importButton">JSON importieren</button>
+              <button type="button" id="helpButton">Hilfe</button>
+              <button type="button" class="destructive" id="resetButton">Alles zur&uuml;cksetzen</button>
+            </div>
+          </details>
+        </div>
+        <input id="importInput" type="file" accept="application/json,.json" hidden>
+        <input id="cvInput" type="file" accept="application/pdf" hidden>
+        <span class="action-status" id="actionStatus" aria-live="polite"></span>
+      </div>
+    </header>
+
+    <section class="workspace" aria-label="Selbsteinschaetzung">
+      <div class="panel chart-panel">
+        <div class="chart-header">
+          <h2 class="chart-title">Spinnennetzdiagramm</h2>
+          <div class="legend" aria-label="Legende">
+            <span class="legend-item"><span class="swatch swatch-reference"></span>Originales Modell</span>
+            <span class="legend-item"><span class="swatch swatch-self"></span>Eigene Einsch&auml;tzung</span>
+          </div>
+        </div>
+        <div class="chart-frame">
+          <svg id="radarChart" viewBox="-410 -360 820 720" role="img" aria-labelledby="radarTitle radarDesc">
+            <title id="radarTitle">Engineering Ladders Radar</title>
+            <desc id="radarDesc">F&uuml;nf Achsen: Technology, System, People, Process, Influence.</desc>
+          </svg>
+          <div class="chart-actions" aria-label="Diagramm-Aktionen">
+            <button type="button" class="chart-action-button" id="chartFullViewButton" aria-label="Diagramm in Vollansicht &ouml;ffnen" title="Vollansicht">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 3H3v5"></path>
+                <path d="M3 3l7 7"></path>
+                <path d="M16 3h5v5"></path>
+                <path d="M21 3l-7 7"></path>
+                <path d="M8 21H3v-5"></path>
+                <path d="M3 21l7-7"></path>
+                <path d="M16 21h5v-5"></path>
+                <path d="M21 21l-7-7"></path>
+              </svg>
+            </button>
+            <button type="button" class="chart-action-button" id="chartDownloadButton" aria-label="Diagramm als PNG herunterladen" title="PNG herunterladen">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12"></path>
+                <path d="M7 10l5 5 5-5"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="context" id="contextGrid" aria-label="Belege"></div>
+        <p class="print-note" id="printSummary"></p>
+      </div>
+
+      <form class="panel controls-panel" id="controlsForm">
+        <div class="profile-row">
+          <div>
+            <label class="field-label" for="profileName">Profil</label>
+            <input class="text-input" id="profileName" name="profileName">
+          </div>
+          <div>
+            <label class="field-label" for="profileDate">Stand</label>
+            <input class="text-input" id="profileDate" name="profileDate" type="date">
+          </div>
+        </div>
+        <section class="cv-panel" id="cvPanel" hidden aria-live="polite">
+          <div class="cv-panel-topline">
+            <h2 class="cv-panel-title">CV-Vorschl&auml;ge</h2>
+            <span class="cv-confidence" id="cvPanelState">Lokal</span>
+          </div>
+          <p class="cv-file-name" id="cvFileName"></p>
+          <p class="cv-status" id="cvStatus">PDF wird lokal im Browser gelesen. Es wird nichts hochgeladen.</p>
+          <p class="cv-count" id="cvCount"></p>
+          <div class="cv-suggestions" id="cvSuggestions"></div>
+          <div class="cv-actions">
+            <button type="button" class="primary" id="cvApplyButton" disabled>Vorschl&auml;ge &uuml;bernehmen</button>
+            <button type="button" id="cvDiscardButton">Verwerfen</button>
+          </div>
+        </section>
+        <div id="axisControls"></div>
+      </form>
+    </section>
+
+    <footer class="source-band">
+      <span>Selbsteinsch&auml;tzung mit eigenen Belegen entlang des Developer-Modells.</span>
+      <span>
+        Quellen:
+        <a href="https://github.com/jorgef/engineeringladders">Github - jorgef</a>
+        <span aria-hidden="true">/</span>
+        <a href="https://www.engineeringladders.com/">engineeringladders.com</a>
+        <span aria-hidden="true">/</span>
+        <button type="button" class="footer-link-button" id="privacyButton">Datenschutz</button>
+      </span>
+    </footer>
+  </main>
+
+  <dialog class="chart-dialog" id="chartDialog" aria-labelledby="chartDialogTitle">
+    <div class="chart-dialog-shell">
+      <header class="chart-dialog-header">
+        <div>
+          <p class="help-kicker">Vollansicht</p>
+          <h2 class="chart-dialog-title" id="chartDialogTitle">Spinnennetzdiagramm</h2>
+        </div>
+        <div class="chart-dialog-actions">
+          <button type="button" class="chart-dialog-action" id="chartDialogDownloadButton" aria-label="Diagramm als PNG herunterladen" title="PNG herunterladen">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12"></path>
+              <path d="M7 10l5 5 5-5"></path>
+              <path d="M5 21h14"></path>
+            </svg>
+          </button>
+          <button type="button" class="chart-dialog-action chart-dialog-close" id="chartDialogCloseButton" aria-label="Vollansicht schlie&szlig;en">&times;</button>
+        </div>
+      </header>
+      <div class="chart-dialog-frame" id="chartDialogFrame"></div>
+    </div>
+  </dialog>
+
+  <dialog class="help-dialog" id="helpDialog" aria-labelledby="helpTitle">
+    <div class="help-shell">
+      <header class="help-header">
+        <div>
+          <p class="help-kicker">Hilfe &amp; technischer Hintergrund</p>
+          <h2 id="helpTitle">Selbsteinsch&auml;tzung Developer Model</h2>
+        </div>
+        <button type="button" class="help-close" id="helpCloseButton" aria-label="Hilfe schlie&szlig;en">&times;</button>
+      </header>
+
+      <div class="help-content">
+        <section class="help-section">
+          <h3>Wof&uuml;r diese Seite gedacht ist</h3>
+          <p>
+            Diese Seite ist eine statische Erweiterung des Open-Source-Projekts
+            <a href="https://github.com/jorgef/engineeringladders" target="_blank" rel="noreferrer">engineeringladders</a>.
+            Sie macht den Developer-Teil als wiederverwendbares Interview- und Selbstreflexionswerkzeug nutzbar:
+            Werte ausw&auml;hlen, eigene Belege sammeln, das Ergebnis als Spinnennetzdiagramm pr&uuml;fen und die
+            Einsch&auml;tzung teilen oder exportieren.
+          </p>
+          <p>
+            Die grauen Linien zeigen das originale Modell als Referenz. Die rote Fl&auml;che zeigt deine aktuelle
+            eigene Einsch&auml;tzung.
+          </p>
+        </section>
+
+        <section class="help-section">
+          <h3>So funktioniert die Nutzung</h3>
+          <ul>
+            <li><strong>Profil und Stand:</strong> Optionaler Name und Datum f&uuml;r Ausdruck, Export und geteilte URL.</li>
+            <li><strong>Regler:</strong> Jede Achse kann von 0 bis 5 bewertet werden. 0 bedeutet nicht bewertet.</li>
+            <li><strong>Belege / Beispiele:</strong> Freitext f&uuml;r konkrete Situationen, Projekte oder Verantwortungen.</li>
+            <li><strong>Zusammenfassung:</strong> Unter dem Diagramm erscheinen der gew&auml;hlte Level, die originale Level-Definition und deine Einsch&auml;tzung.</li>
+            <li><strong>URL teilen:</strong> Schreibt den vollst&auml;ndigen Zustand inklusive Notizen in den URL-Hash und kopiert die URL, wenn der Browser es erlaubt.</li>
+            <li><strong>JSON exportieren/importieren:</strong> Speichert oder l&auml;dt Profil, Datum, Werte und Notizen als Datei.</li>
+            <li><strong>Alles zur&uuml;cksetzen:</strong> Leert Werte, Notizen, Profil, lokale Daten und geteilten URL-Hash.</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h3>Zus&auml;tzliche Funktionen dieser Version</h3>
+          <ul>
+            <li><strong>Statische GitHub-Pages-Version:</strong> Die Anwendung besteht aus einer HTML-Datei mit CSS und JavaScript und braucht keinen Server.</li>
+            <li><strong>Wiederverwendbare Eingaben:</strong> Die Zusammenfassung nutzt deine eigenen Belege statt fest vorbereiteter CV-Texte.</li>
+            <li><strong>PDF-CV-Import:</strong> Ein CV kann lokal im Browser analysiert werden. Es wird nichts hochgeladen.</li>
+            <li><strong>Pr&uuml;fbare CV-Vorschl&auml;ge:</strong> Erkannte Begriffe werden als ausw&auml;hlbare Chips angezeigt und k&ouml;nnen einzeln entfernt werden, bevor sie &uuml;bernommen werden.</li>
+            <li><strong>Teilen und Import/Export:</strong> Die komplette Einsch&auml;tzung kann per URL oder JSON weitergegeben werden.</li>
+            <li><strong>Druckansicht:</strong> Die Seite blendet Eingabefelder aus und bereitet Diagramm und Zusammenfassung f&uuml;r den Druck vor.</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h3>Technische Umsetzung</h3>
+          <ul>
+            <li><strong>Rendering:</strong> Das Diagramm wird als SVG erzeugt. Die Punkte werden aus den f&uuml;nf Achsen und den Werten 0 bis 5 berechnet.</li>
+            <li><strong>Status:</strong> Ein JavaScript-State-Objekt h&auml;lt Profil, Datum, Achsenwerte und Notizen. Nach jeder &Auml;nderung werden Diagramm, Eingaben und Karten neu gerendert.</li>
+            <li><strong>Persistenz:</strong> Der Zustand wird in <code>localStorage</code> gespeichert. Die geteilte URL kodiert denselben Zustand als JSON im URL-Hash.</li>
+            <li><strong>Sicherheit:</strong> Freitexte werden vor der Ausgabe escaped, damit keine HTML-Inhalte aus Textfeldern ausgef&uuml;hrt werden.</li>
+            <li><strong>PDF-Verarbeitung:</strong> PDF.js wird lokal aus diesem GitHub-Projekt geladen und liest Text aus textbasierten PDFs direkt im Browser. OCR f&uuml;r gescannte PDFs ist nicht enthalten.</li>
+            <li><strong>CV-Heuristik:</strong> Eine transparente Keyword-Liste pro Achse erkennt Begriffe wie Technologien, Betrieb, Mentoring, Prozesse oder Wirkungskreise. Daraus werden Vorschlagswerte, Konfidenz und ausw&auml;hlbare Begriff-Chips gebildet.</li>
+            <li><strong>Kein AI-Backend:</strong> Es werden keine API-Keys, Serverfunktionen oder Uploads verwendet. Die Analyse ist deterministisch und lokal.</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h3>CV-Import: Parser und Zuordnung</h3>
+          <p>
+            Der CV-Import ist bewusst als lokale, nachvollziehbare Heuristik gebaut. Er soll beim Sortieren und
+            Vorbereiten von Belegen helfen, ersetzt aber keine fachliche Bewertung durch die Person, die das
+            Interview oder die Selbstreflexion vorbereitet.
+          </p>
+          <ul>
+            <li><strong>Dateiauswahl:</strong> Der Button <code>CV importieren</code> &ouml;ffnet ein verstecktes PDF-Dateifeld. Die ausgew&auml;hlte Datei bleibt im Browser und wird nicht an einen Server gesendet.</li>
+            <li><strong>Textauslesung:</strong> PDF.js liest jede PDF-Seite mit <code>getTextContent()</code> aus. Die Textfragmente der Seiten werden zusammengef&uuml;hrt.</li>
+            <li><strong>Normalisierung:</strong> Der extrahierte Text wird bereinigt: gesch&uuml;tzte Leerzeichen werden ersetzt, mehrere Leerzeichen reduziert und &uuml;berfl&uuml;ssige Zeilenumbr&uuml;che gegl&auml;ttet.</li>
+            <li><strong>Grenze f&uuml;r leere PDFs:</strong> Wenn zu wenig Text extrahiert wird, wird keine Analyse angezeigt. Das betrifft zum Beispiel gescannte PDFs ohne OCR-Textschicht.</li>
+            <li><strong>Achsen-Mapping:</strong> Jede der f&uuml;nf Achsen hat eine eigene Keyword-Liste: Technology, System, People, Process und Influence.</li>
+            <li><strong>Keyword-Suche:</strong> Die Begriffe werden mit regul&auml;ren Ausdr&uuml;cken gesucht, damit nicht einfach beliebige Teilstrings gewertet werden. Varianten wie <code>Node.js</code> und <code>nodejs</code> werden anschlie&szlig;end zusammengef&uuml;hrt.</li>
+            <li><strong>Gewichtung:</strong> Jedes gefundene Keyword hat ein Gewicht. St&auml;rkere Signale wie SLAs, Kubernetes, Cross-Team oder Community z&auml;hlen h&ouml;her als allgemeinere Begriffe.</li>
+            <li><strong>Level-Vorschlag:</strong> Die gewichtete Summe einer Achse wird in einen Wert von 0 bis 5 &uuml;bersetzt. Dieser Wert ist ein Vorschlag, keine automatische Einstufung.</li>
+            <li><strong>Konfidenz:</strong> Die Anzeige <code>niedrig</code>, <code>mittel</code> oder <code>hoch</code> basiert auf Score, vorgeschlagenem Level und Anzahl gefundener Textstellen.</li>
+            <li><strong>Begriff-Chips:</strong> Gefundene Begriffe werden als ausw&auml;hlbare Chips angezeigt. Nutzer k&ouml;nnen einzelne Begriffe entfernen, bevor die Vorschl&auml;ge &uuml;bernommen werden.</li>
+            <li><strong>Import in die Einsch&auml;tzung:</strong> Erst nach <code>Vorschl&auml;ge &uuml;bernehmen</code> werden die verbleibenden Begriffe in die Notizfelder geschrieben und die Regler auf die vorgeschlagenen Werte gesetzt.</li>
+            <li><strong>Transparenz:</strong> Es gibt kein verstecktes Modell und keine externe Bewertung. Die Vorschl&auml;ge entstehen nur aus den sichtbaren Keyword-Listen und der lokalen PDF-Textauslesung.</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h3>Geltungsbereich</h3>
+          <p>
+            Diese Version ist aktuell nur f&uuml;r den Developer-Teil des Engineering-Ladders-Modells umgesetzt.
+            Das Originalprojekt enth&auml;lt weitere Markdown-Varianten wie Tech Lead, Technical Program Manager und
+            Engineering Manager. Die gleiche statische Struktur k&ouml;nnte daf&uuml;r angepasst werden, wenn die Achsen,
+            Level-Texte und Heuristiken entsprechend ausgetauscht werden.
+          </p>
+        </section>
+
+        <section class="help-section">
+          <h3>Developer-Level aus Developer.md</h3>
+          <p>
+            Die folgende &Uuml;bersicht ist eine deutsche Zusammenfassung der Developer-Level aus
+            <a href="https://github.com/jorgef/engineeringladders/blob/master/Developer.md" target="_blank" rel="noreferrer">Developer.md</a>.
+          </p>
+          <div class="help-levels">
+            <article>
+              <h4>D1 - Developer 1</h4>
+              <ul>
+                <li><strong>Technology:</strong> lernt und nutzt aktiv die vom Team definierten Technologien und Werkzeuge.</li>
+                <li><strong>System:</strong> liefert Features und Bugfixes, die das System verbessern und erweitern.</li>
+                <li><strong>People:</strong> lernt schnell von anderen und springt verl&auml;sslich ein, wenn es n&ouml;tig ist.</li>
+                <li><strong>Process:</strong> folgt den Teamprozessen und liefert kontinuierlich Features in Produktion.</li>
+                <li><strong>Influence:</strong> wirkt auf ein oder mehrere Subsysteme oder Team-Pods.</li>
+              </ul>
+            </article>
+            <article>
+              <h4>D2 - Developer 2</h4>
+              <ul>
+                <li><strong>Technology:</strong> lernt und nutzt weiterhin aktiv die vom Team definierten Technologien und Werkzeuge.</li>
+                <li><strong>System:</strong> designt und implementiert mittlere bis gro&szlig;e Features und reduziert technische Schulden.</li>
+                <li><strong>People:</strong> unterst&uuml;tzt andere Teammitglieder proaktiv und hilft ihnen erfolgreich zu sein.</li>
+                <li><strong>Process:</strong> setzt Teamprozesse durch und erkl&auml;rt Nutzen und Trade-offs.</li>
+                <li><strong>Influence:</strong> wirkt auf ein oder mehrere Subsysteme oder Team-Pods.</li>
+              </ul>
+            </article>
+            <article>
+              <h4>D3 - Developer 3</h4>
+              <ul>
+                <li><strong>Technology:</strong> ist Ansprechperson f&uuml;r eine oder mehrere Technologien und lernt eigeninitiativ neue.</li>
+                <li><strong>System:</strong> designt und implementiert mittlere bis gro&szlig;e Features und reduziert technische Schulden.</li>
+                <li><strong>People:</strong> unterst&uuml;tzt andere Teammitglieder proaktiv und hilft ihnen erfolgreich zu sein.</li>
+                <li><strong>Process:</strong> hinterfragt Teamprozesse und sucht Verbesserungsm&ouml;glichkeiten.</li>
+                <li><strong>Influence:</strong> wirkt auf das ganze Team, nicht nur auf einzelne Teile.</li>
+              </ul>
+            </article>
+            <article>
+              <h4>D4 - Developer 4</h4>
+              <ul>
+                <li><strong>Technology:</strong> recherchiert, erstellt Proofs of Concept und bringt neue Technologien ins Team.</li>
+                <li><strong>System:</strong> verantwortet Betrieb und Monitoring des Systems und kennt dessen SLAs.</li>
+                <li><strong>People:</strong> mentort andere, beschleunigt Karrierewachstum und f&ouml;rdert Beteiligung.</li>
+                <li><strong>Process:</strong> hinterfragt Teamprozesse und sucht Verbesserungsm&ouml;glichkeiten.</li>
+                <li><strong>Influence:</strong> wirkt auf das ganze Team, nicht nur auf einzelne Teile.</li>
+              </ul>
+            </article>
+            <article>
+              <h4>D5 - Developer 5</h4>
+              <ul>
+                <li><strong>Technology:</strong> kennt den gesamten Technologie-Stack des Systems sehr tief.</li>
+                <li><strong>System:</strong> entwickelt die Architektur f&uuml;r k&uuml;nftige Anforderungen weiter und definiert SLAs.</li>
+                <li><strong>People:</strong> mentort andere, beschleunigt Karrierewachstum und f&ouml;rdert Beteiligung.</li>
+                <li><strong>Process:</strong> passt Teamprozesse anhand von Feedback an und begleitet das Team durch Ver&auml;nderungen.</li>
+                <li><strong>Influence:</strong> wirkt nicht nur im eigenen Team, sondern auch in anderen Teams.</li>
+              </ul>
+            </article>
+            <article>
+              <h4>D6 - Developer 6</h4>
+              <ul>
+                <li><strong>Technology:</strong> designt und schafft neue Technologien, die intern oder extern breit genutzt werden.</li>
+                <li><strong>System:</strong> f&uuml;hrt technische Exzellenz des Systems und plant Ma&szlig;nahmen gegen Ausf&auml;lle.</li>
+                <li><strong>People:</strong> mentort andere, beschleunigt Karrierewachstum und f&ouml;rdert Beteiligung.</li>
+                <li><strong>Process:</strong> passt Teamprozesse anhand von Feedback an und begleitet das Team durch Ver&auml;nderungen.</li>
+                <li><strong>Influence:</strong> wirkt auf die gesamte Tech-Organisation.</li>
+              </ul>
+            </article>
+            <article>
+              <h4>D7 - Developer 7</h4>
+              <ul>
+                <li><strong>Technology:</strong> designt und schafft neue Technologien, die intern oder extern breit genutzt werden.</li>
+                <li><strong>System:</strong> f&uuml;hrt technische Exzellenz des Systems und plant Ma&szlig;nahmen gegen Ausf&auml;lle.</li>
+                <li><strong>People:</strong> mentort andere, beschleunigt Karrierewachstum und f&ouml;rdert Beteiligung.</li>
+                <li><strong>Process:</strong> passt Teamprozesse anhand von Feedback an und begleitet das Team durch Ver&auml;nderungen.</li>
+                <li><strong>Influence:</strong> wirkt auf die technische Community.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="help-dialog" id="privacyDialog" aria-labelledby="privacyTitle">
+    <div class="help-shell">
+      <header class="help-header">
+        <div>
+          <p class="help-kicker">Datenschutz</p>
+          <h2 id="privacyTitle">Lokale Verarbeitung und gespeicherte Daten</h2>
+        </div>
+        <button type="button" class="help-close" id="privacyCloseButton" aria-label="Datenschutz schlie&szlig;en">&times;</button>
+      </header>
+
+      <div class="help-content">
+        <section class="help-section">
+          <h3>Kurzfassung</h3>
+          <p>
+            Diese Seite ist als statische GitHub-Pages-Anwendung gebaut. Die Selbsteinsch&auml;tzung, Notizen
+            und der CV-Import laufen im Browser. Es gibt in dieser Version keinen eigenen Server, kein
+            AI-Backend, keine API-Keys und keinen Upload deines CVs durch diese Anwendung.
+          </p>
+        </section>
+
+        <section class="help-section">
+          <h3>CV-Import</h3>
+          <ul>
+            <li><strong>Lokale Datei:</strong> Der ausgew&auml;hlte PDF-CV wird im Browser mit PDF.js gelesen und nicht an diese Website, GitHub oder einen eigenen Backend-Service hochgeladen.</li>
+            <li><strong>Lokale Bibliothek:</strong> PDF.js wird aus dem Ordner <code>vendor/pdfjs</code> dieses Projekts geladen. Dadurch entsteht f&uuml;r die PDF-Verarbeitung kein zus&auml;tzlicher CDN-Aufruf an einen Drittanbieter.</li>
+            <li><strong>Keine OCR:</strong> Gescannte PDFs ohne Textschicht werden nicht ausgelesen. In diesem Fall m&uuml;ssen Belege manuell eingetragen werden.</li>
+            <li><strong>Keine automatische Entscheidung:</strong> Die Vorschl&auml;ge entstehen aus lokalen Keyword-Regeln und m&uuml;ssen aktiv gepr&uuml;ft und &uuml;bernommen werden.</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h3>Lokale Speicherung</h3>
+          <ul>
+            <li><strong>Browser-Speicher:</strong> Profil, Datum, Achsenwerte und Notizen werden im <code>localStorage</code> deines Browsers gespeichert, damit die Eingaben beim Neuladen erhalten bleiben.</li>
+            <li><strong>Zur&uuml;cksetzen:</strong> <code>Alles zur&uuml;cksetzen</code> l&ouml;scht diese lokalen Daten, die Notizen, das Profil und den geteilten URL-Hash.</li>
+            <li><strong>JSON:</strong> Beim JSON-Export wird eine Datei lokal im Browser erzeugt. Beim JSON-Import wird nur die ausgew&auml;hlte Datei im Browser gelesen.</li>
+          </ul>
+        </section>
+
+        <section class="help-section">
+          <h3>Teilen per URL</h3>
+          <p>
+            <code>URL teilen</code> schreibt den Zustand der Einsch&auml;tzung inklusive Notizen in den URL-Hash.
+            Wer diese URL erh&auml;lt, kann die enthaltenen Daten lesen. Nutze diese Funktion daher nur, wenn
+            die Notizen f&uuml;r die Empf&auml;nger bestimmt sind.
+          </p>
+        </section>
+
+        <section class="help-section">
+          <h3>Hosting durch GitHub Pages</h3>
+          <p>
+            Die Website wird &uuml;ber GitHub Pages ausgeliefert. Beim Aufruf einer GitHub-Pages-Seite k&ouml;nnen
+            technische Zugriffsdaten wie IP-Adresse und Request-Metadaten durch GitHub verarbeitet werden,
+            insbesondere f&uuml;r Sicherheit und Betrieb des Dienstes. Diese Anwendung selbst betreibt keine
+            zus&auml;tzliche serverseitige Protokollierung.
+          </p>
+        </section>
+
+        <section class="help-section">
+          <h3>Empfehlung</h3>
+          <p>
+            Trage nur Informationen ein, die du f&uuml;r die Selbstreflexion oder das Gespr&auml;ch verwenden m&ouml;chtest.
+            Pr&uuml;fe CV-Vorschl&auml;ge vor dem &Uuml;bernehmen und teile URLs oder JSON-Dateien nur bewusst mit
+            den Personen, die diese Inhalte sehen sollen.
+          </p>
+        </section>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    const storageKey = "developer-self-assessment-v3";
+    let pdfJsReady = null;
+
+    function loadPdfJs() {
+      if (!pdfJsReady) {
+        pdfJsReady = import("./vendor/pdfjs/pdf.mjs")
+          .then((pdfjsLib) => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("./vendor/pdfjs/pdf.worker.mjs", document.baseURI).href;
+            return pdfjsLib;
+          })
+          .catch((error) => {
+            console.error("PDF.js konnte nicht lokal geladen werden.", error);
+            pdfJsReady = null;
+            return null;
+          });
+      }
+      return pdfJsReady;
+    }
+
+    const axes = [
+      {
+        id: "technology",
+        label: "Technology",
+        levels: ["Adopts", "Specializes", "Evangelizes", "Masters", "Creates"],
+        definitions: [
+          { label: "Adopts", copy: "Actively learns and adopts the technology and tools defined by the team" },
+          { label: "Specializes", copy: "Is the go-to person for one or more technologies and takes initiative to learn new ones" },
+          { label: "Evangelizes", copy: "Researches, creates proofs of concept and introduces new technologies to the team" },
+          { label: "Masters", copy: "Has very deep knowledge about the whole technology stack of the system" },
+          { label: "Creates", copy: "Designs and creates new technologies that are widely used either by internal or external teams" }
+        ]
+      },
+      {
+        id: "system",
+        label: "System",
+        levels: ["Enhances", "Designs", "Owns", "Evolves", "Leads"],
+        definitions: [
+          { label: "Enhances", copy: "Successfully pushes new features and bug fixes to improve and extend the system" },
+          { label: "Designs", copy: "Designs and implements medium to large size features while reducing the system's tech debt" },
+          { label: "Owns", copy: "Owns the production operation and monitoring of the system and is aware of its SLAs" },
+          { label: "Evolves", copy: "Evolves the architecture to support future requirements and defines its SLAs" },
+          { label: "Leads", copy: "Leads the technical excellence of the system and creates plans to mitigate outages" }
+        ]
+      },
+      {
+        id: "people",
+        label: "People",
+        levels: ["Learns", "Supports", "Mentors", "Coordinates", "Manages"],
+        definitions: [
+          { label: "Learns", copy: "Quickly learns from others and consistently steps up when it is required" },
+          { label: "Supports", copy: "Proactively supports other team members and helps them to be successful" },
+          { label: "Mentors", copy: "Mentors others to accelerate their career-growth and encourages them to participate" },
+          { label: "Coordinates", copy: "Coordinates team members providing effective feedback and moderating discussions" },
+          { label: "Manages", copy: "Manages the team members' career, expectations, performance and level of happiness" }
+        ]
+      },
+      {
+        id: "process",
+        label: "Process",
+        levels: ["Follows", "Enforces", "Challenges", "Adjusts", "Defines"],
+        definitions: [
+          { label: "Follows", copy: "Follows the team processes, delivering a consistent flow of features to production" },
+          { label: "Enforces", copy: "Enforces the team processes, making sure everybody understands the benefits and tradeoffs" },
+          { label: "Challenges", copy: "Challenges the team processes, looking for ways to improve them" },
+          { label: "Adjusts", copy: "Adjusts the team processes, listening to feedback and guiding the team through the changes" },
+          { label: "Defines", copy: "Defines the right processes for the team's maturity level, balancing agility and discipline" }
+        ]
+      },
+      {
+        id: "influence",
+        label: "Influence",
+        levels: ["Subsystem", "Team", "Multiple Teams", "Company", "Community"],
+        definitions: [
+          { label: "Subsystem", copy: "Makes an impact on one or more subsystems" },
+          { label: "Team", copy: "Makes an impact on the whole team, not just on specific parts of it" },
+          { label: "Multiple Teams", copy: "Makes an impact not only his/her team but also on other teams" },
+          { label: "Company", copy: "Makes an impact on the whole tech organization" },
+          { label: "Community", copy: "Makes an impact on the tech community" }
+        ]
+      }
+    ];
+
+    const cvHeuristics = {
+      technology: {
+        terms: [
+          ["javascript", 2], ["typescript", 2], ["php", 2], ["python", 2], ["java", 2],
+          ["react", 2], ["node.js", 2], ["nodejs", 2], ["sql", 2], ["postgresql", 2],
+          ["mysql", 2], ["jquery", 1], ["html", 1], ["html5", 1], ["css", 1],
+          ["scss", 1], ["sass", 1], ["api", 1], ["rest", 1], ["graphql", 1], ["frontend", 1],
+          ["backend", 1], ["fullstack", 2], ["full-stack", 2], ["architecture", 2],
+          ["architektur", 2], ["cloud", 1], ["docker", 1], ["kubernetes", 2],
+          ["wordpress", 1], ["woocommerce", 1], ["llm", 1], ["rag", 1], ["ai engineering", 2]
+        ]
+      },
+      system: {
+        terms: [
+          ["production", 2], ["produktion", 2], ["monitoring", 2], ["observability", 2],
+          ["alerting", 2], ["sla", 3], ["slo", 2], ["sli", 2], ["uptime", 2],
+          ["reliability", 2], ["stability", 2], ["stabilit", 2], ["incident", 2],
+          ["on-call", 2], ["devops", 2], ["ci/cd", 2], ["cicd", 2], ["security", 2],
+          ["backup", 1], ["infrastructure", 2], ["infrastruktur", 2], ["performance", 1],
+          ["scaling", 2], ["skalierung", 2], ["operations", 2], ["betrieb", 2]
+        ]
+      },
+      people: {
+        terms: [
+          ["mentor", 2], ["mentoring", 2], ["coach", 2], ["coaching", 2],
+          ["leadership", 2], ["leitung", 2], ["team lead", 2], ["teamleitung", 2],
+          ["feedback", 2], ["hiring", 2], ["recruiting", 2], ["stakeholder", 1],
+          ["collaboration", 1], ["zusammenarbeit", 1], ["workshop", 1], ["training", 1],
+          ["moderation", 2], ["facilitation", 2], ["career", 1], ["karriere", 1]
+        ]
+      },
+      process: {
+        terms: [
+          ["agile", 1], ["scrum", 2], ["kanban", 2], ["roadmap", 2], ["planning", 2],
+          ["planung", 2], ["prioritization", 2], ["priorisierung", 2], ["postmortem", 2],
+          ["retrospective", 2], ["retro", 1], ["incident response", 2], ["rca", 2],
+          ["root cause", 2], ["standards", 2], ["documentation", 1], ["dokumentation", 1],
+          ["delivery", 2], ["release", 1], ["process", 1], ["prozess", 1],
+          ["automation", 2], ["automatisierung", 2], ["quality", 1], ["testing", 1]
+        ]
+      },
+      influence: {
+        terms: [
+          ["cross-team", 3], ["cross team", 3], ["multiple teams", 3], ["mehrere teams", 3],
+          ["organization", 3], ["organisation", 3], ["company", 3], ["unternehmen", 3],
+          ["department", 2], ["abteilung", 2], ["platform", 2], ["plattform", 2],
+          ["strategy", 2], ["strategie", 2], ["stakeholder", 1], ["community", 3],
+          ["open source", 3], ["conference", 2], ["konferenz", 2], ["enterprise", 2],
+          ["governance", 2], ["architecture board", 3], ["tech organization", 3]
+        ]
+      }
+    };
+
+    const cvTermLabels = {
+      "ai engineering": "AI Engineering",
+      api: "API",
+      ci: "CI",
+      "ci/cd": "CI/CD",
+      cicd: "CI/CD",
+      css: "CSS",
+      devops: "DevOps",
+      graphql: "GraphQL",
+      html: "HTML",
+      html5: "HTML5",
+      javascript: "JavaScript",
+      jquery: "jQuery",
+      kubernetes: "Kubernetes",
+      llm: "LLM",
+      mysql: "MySQL",
+      "node.js": "Node.js",
+      nodejs: "Node.js",
+      php: "PHP",
+      postgresql: "PostgreSQL",
+      rag: "RAG",
+      rca: "RCA",
+      react: "React",
+      rest: "REST",
+      sass: "Sass",
+      sla: "SLA",
+      sli: "SLI",
+      slo: "SLO",
+      sql: "SQL",
+      scss: "SCSS",
+      typescript: "TypeScript",
+      woocommerce: "WooCommerce",
+      wordpress: "WordPress"
+    };
+
+    const state = {
+      profileName: "",
+      profileDate: new Date().toISOString().slice(0, 10),
+      values: Object.fromEntries(axes.map((axis) => [axis.id, 0])),
+      notes: Object.fromEntries(axes.map((axis) => [axis.id, ""]))
+    };
+
+    const svg = document.getElementById("radarChart");
+    const chartFullViewButton = document.getElementById("chartFullViewButton");
+    const chartDownloadButton = document.getElementById("chartDownloadButton");
+    const chartDialog = document.getElementById("chartDialog");
+    const chartDialogFrame = document.getElementById("chartDialogFrame");
+    const chartDialogDownloadButton = document.getElementById("chartDialogDownloadButton");
+    const chartDialogCloseButton = document.getElementById("chartDialogCloseButton");
+    const axisControls = document.getElementById("axisControls");
+    const contextGrid = document.getElementById("contextGrid");
+    const printSummary = document.getElementById("printSummary");
+    const profileName = document.getElementById("profileName");
+    const profileDate = document.getElementById("profileDate");
+    const moreActions = document.getElementById("moreActions");
+    const helpButton = document.getElementById("helpButton");
+    const helpDialog = document.getElementById("helpDialog");
+    const helpCloseButton = document.getElementById("helpCloseButton");
+    const privacyButton = document.getElementById("privacyButton");
+    const privacyDialog = document.getElementById("privacyDialog");
+    const privacyCloseButton = document.getElementById("privacyCloseButton");
+    const resetButton = document.getElementById("resetButton");
+    const exportButton = document.getElementById("exportButton");
+    const importButton = document.getElementById("importButton");
+    const importInput = document.getElementById("importInput");
+    const cvImportButton = document.getElementById("cvImportButton");
+    const cvInput = document.getElementById("cvInput");
+    const cvPanel = document.getElementById("cvPanel");
+    const cvPanelState = document.getElementById("cvPanelState");
+    const cvFileName = document.getElementById("cvFileName");
+    const cvStatus = document.getElementById("cvStatus");
+    const cvCount = document.getElementById("cvCount");
+    const cvSuggestions = document.getElementById("cvSuggestions");
+    const cvApplyButton = document.getElementById("cvApplyButton");
+    const cvDiscardButton = document.getElementById("cvDiscardButton");
+    const actionStatus = document.getElementById("actionStatus");
+    let actionStatusTimer;
+    let cvImportState = null;
+
+    function closeMoreActions() {
+      if (moreActions) {
+        moreActions.open = false;
+      }
+    }
+
+    function pointFor(index, value, radius = 250) {
+      const angle = -Math.PI / 2 + index * ((Math.PI * 2) / axes.length);
+      const distance = radius * (value / 5);
+      return {
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance
+      };
+    }
+
+    function pointsFor(values) {
+      return axes
+        .map((axis, index) => pointFor(index, values[axis.id]))
+        .map((point) => `${point.x.toFixed(2)},${point.y.toFixed(2)}`)
+        .join(" ");
+    }
+
+    function svgElement(name, attrs = {}) {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
+      return element;
+    }
+
+    function clampAssessmentValue(value) {
+      return Math.min(5, Math.max(0, value));
+    }
+
+    function levelNameFor(axis, value) {
+      return value > 0 ? axis.levels[value - 1] : "Nicht bewertet";
+    }
+
+    function definitionFor(axis, value) {
+      return value > 0 ? axis.definitions[value - 1] : null;
+    }
+
+    function renderLevelLabel(axis, index, levelIndex, selected = false) {
+      const levelValue = levelIndex + 1;
+      const level = axis.levels[levelIndex];
+      const levelPoint = pointFor(index, levelValue);
+      const isLeft = levelPoint.x < -10;
+      const levelLabel = svgElement("text", {
+        x: levelPoint.x + (isLeft ? -8 : 8),
+        y: levelPoint.y + 4,
+        class: selected ? "level-label selected-level-label" : "level-label",
+        "text-anchor": isLeft ? "end" : "start"
+      });
+      levelLabel.textContent = selected ? `${levelValue} - ${level}` : level;
+      svg.appendChild(levelLabel);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function getAssessmentState() {
+      return {
+        version: 1,
+        profileName: state.profileName,
+        profileDate: state.profileDate,
+        values: Object.fromEntries(axes.map((axis) => [axis.id, state.values[axis.id]])),
+        notes: Object.fromEntries(axes.map((axis) => [axis.id, state.notes[axis.id] || ""]))
+      };
+    }
+
+    function applyAssessmentState(nextState) {
+      if (!nextState || typeof nextState !== "object") {
+        throw new Error("Invalid assessment state");
+      }
+
+      if (typeof nextState.profileName === "string") {
+        state.profileName = nextState.profileName;
+      }
+      if (typeof nextState.profileDate === "string") {
+        state.profileDate = nextState.profileDate;
+      }
+
+      axes.forEach((axis) => {
+        const value = Number(nextState.values?.[axis.id]);
+        if (Number.isInteger(value)) {
+          state.values[axis.id] = clampAssessmentValue(value);
+        }
+        if (typeof nextState.notes?.[axis.id] === "string") {
+          state.notes[axis.id] = nextState.notes[axis.id];
+        }
+      });
+    }
+
+    function encodeAssessmentState() {
+      const json = JSON.stringify(getAssessmentState());
+      const bytes = new TextEncoder().encode(json);
+      let binary = "";
+      bytes.forEach((byte) => {
+        binary += String.fromCharCode(byte);
+      });
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
+    function decodeAssessmentState(encoded) {
+      const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+      const binary = atob(padded);
+      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function escapeRegExp(value) {
+      return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function normalizeCvText(value) {
+      return String(value)
+        .replace(/\u00a0/g, " ")
+        .replace(/[ \t]+/g, " ")
+        .replace(/\s*\n\s*/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function termPattern(term) {
+      return new RegExp(`(^|[^a-z0-9])${escapeRegExp(term.toLowerCase())}([^a-z0-9]|$)`, "i");
+    }
+
+    function findTermIndex(textLower, term) {
+      const match = textLower.match(termPattern(term));
+      return match?.index ?? -1;
+    }
+
+    function valueFromCvScore(score) {
+      if (score <= 0) return 0;
+      if (score <= 2) return 1;
+      if (score <= 5) return 2;
+      if (score <= 8) return 3;
+      if (score <= 12) return 4;
+      return 5;
+    }
+
+    function confidenceFromSuggestion(value, snippetCount, score) {
+      if (value >= 4 && snippetCount >= 2 && score >= 9) return "hoch";
+      if (value >= 2 && snippetCount >= 1) return "mittel";
+      return "niedrig";
+    }
+
+    function snippetAround(text, textLower, term) {
+      const index = findTermIndex(textLower, term);
+      if (index < 0) return "";
+      const start = Math.max(0, index - 100);
+      const end = Math.min(text.length, index + term.length + 140);
+      const prefix = start > 0 ? "..." : "";
+      const suffix = end < text.length ? "..." : "";
+      return `${prefix}${text.slice(start, end).replace(/\s+/g, " ").trim()}${suffix}`;
+    }
+
+    function displayCvTerm(term) {
+      const normalized = String(term).toLowerCase();
+      if (cvTermLabels[normalized]) return cvTermLabels[normalized];
+      return normalized
+        .split(/([/\-\s]+)/)
+        .map((part) => part.match(/[a-z]/) ? part.charAt(0).toUpperCase() + part.slice(1) : part)
+        .join("");
+    }
+
+    function cvTermKey(term) {
+      return displayCvTerm(term).toLowerCase().replace(/[^a-z0-9]+/g, "");
+    }
+
+    function buildCvTermItems(matchedTerms, text, textLower) {
+      const seen = new Set();
+      return matchedTerms.reduce((items, term) => {
+        const key = cvTermKey(term);
+        if (seen.has(key)) return items;
+        seen.add(key);
+        items.push({
+          key,
+          label: displayCvTerm(term),
+          snippet: snippetAround(text, textLower, term),
+          term
+        });
+        return items;
+      }, []);
+    }
+
+    function analyzeCvAxis(axis, text, textLower) {
+      const config = cvHeuristics[axis.id];
+      let score = 0;
+      const matchedTerms = [];
+
+      config.terms.forEach(([term, weight]) => {
+        if (termPattern(term).test(textLower)) {
+          score += weight;
+          matchedTerms.push(term);
+        }
+      });
+
+      const snippets = [];
+      matchedTerms.forEach((term) => {
+        if (snippets.length >= 3) return;
+        const snippet = snippetAround(text, textLower, term);
+        if (snippet && !snippets.includes(snippet)) {
+          snippets.push(snippet);
+        }
+      });
+
+      const value = valueFromCvScore(score);
+      return {
+        axisId: axis.id,
+        axisLabel: axis.label,
+        confidence: confidenceFromSuggestion(value, snippets.length, score),
+        items: buildCvTermItems(matchedTerms, text, textLower),
+        level: levelNameFor(axis, value),
+        matchedTerms,
+        score,
+        snippets,
+        value
+      };
+    }
+
+    function analyzeCvText(text) {
+      const textLower = text.toLowerCase();
+      return axes.map((axis) => analyzeCvAxis(axis, text, textLower));
+    }
+
+    async function extractTextFromPdf(file) {
+      const pdfjsLib = await loadPdfJs();
+      if (!pdfjsLib) {
+        throw new Error("PDF.js konnte nicht geladen werden");
+      }
+
+      const data = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({
+        data,
+        isEvalSupported: false
+      });
+      const pdf = await loadingTask.promise;
+      const pages = [];
+
+      try {
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+          const page = await pdf.getPage(pageNumber);
+          const content = await page.getTextContent();
+          pages.push(content.items.map((item) => item.str).join(" "));
+        }
+      } finally {
+        if (typeof loadingTask.destroy === "function") {
+          await loadingTask.destroy();
+        } else if (typeof pdf.destroy === "function") {
+          await pdf.destroy();
+        }
+      }
+
+      return normalizeCvText(pages.join("\n"));
+    }
+
+    function renderCvPanel() {
+      if (!cvImportState) {
+        cvPanel.hidden = true;
+        return;
+      }
+
+      cvPanel.hidden = false;
+      cvPanelState.textContent = cvImportState.stateLabel;
+      cvFileName.textContent = cvImportState.fileName ? `Datei: ${cvImportState.fileName}` : "";
+      cvStatus.textContent = cvImportState.status;
+      cvCount.textContent = Number.isInteger(cvImportState.characterCount)
+        ? `Extrahierte Zeichen: ${cvImportState.characterCount}`
+        : "";
+      cvApplyButton.disabled = !cvImportState.suggestions?.some((suggestion) => suggestion.value > 0 && suggestion.items?.length);
+
+      if (!cvImportState.suggestions?.length) {
+        cvSuggestions.replaceChildren();
+        return;
+      }
+
+      cvSuggestions.innerHTML = cvImportState.suggestions.map((suggestion) => {
+        const items = Array.isArray(suggestion.items) ? suggestion.items : [];
+        const terms = items.length
+          ? `<ul class="cv-term-list">${items.map((item, index) => `
+              <li>
+                <button
+                  type="button"
+                  class="cv-term-button"
+                  data-axis-id="${escapeHtml(suggestion.axisId)}"
+                  data-term-index="${index}"
+                  title="${escapeHtml(item.snippet || item.label)}"
+                  aria-label="${escapeHtml(item.label)} aus ${escapeHtml(suggestion.axisLabel)} entfernen"
+                >
+                  <span class="cv-term-label">${escapeHtml(item.label)}</span>
+                  <span class="cv-term-remove" aria-hidden="true">&times;</span>
+                </button>
+              </li>
+            `).join("")}</ul>`
+          : `<p class="cv-empty-terms">Keine Begriffe ausgew&auml;hlt.</p>`;
+        return `
+          <article class="cv-suggestion">
+            <div class="cv-suggestion-head">
+              <span>${escapeHtml(suggestion.axisLabel)}: ${suggestion.value} ${escapeHtml(suggestion.level)}</span>
+              <span class="cv-confidence">${escapeHtml(suggestion.confidence)}</span>
+            </div>
+            ${terms}
+          </article>
+        `;
+      }).join("");
+    }
+
+    function removeCvTerm(axisId, termIndex) {
+      if (!cvImportState?.suggestions?.length) return;
+      const suggestion = cvImportState.suggestions.find((item) => item.axisId === axisId);
+      if (!suggestion || !Number.isInteger(termIndex) || !Array.isArray(suggestion.items)) return;
+      suggestion.items.splice(termIndex, 1);
+      renderCvPanel();
+    }
+
+    function resetCvImportPanel() {
+      cvImportState = null;
+      cvInput.value = "";
+      renderCvPanel();
+    }
+
+    function applyCvSuggestions() {
+      if (!cvImportState?.suggestions?.length) return;
+
+      cvImportState.suggestions.forEach((suggestion) => {
+        const items = Array.isArray(suggestion.items) ? suggestion.items : [];
+        if (!items.length) return;
+        state.values[suggestion.axisId] = suggestion.value;
+        state.notes[suggestion.axisId] = items.map((item) => item.label).join(", ");
+      });
+
+      clearSharedUrl();
+      render();
+      saveLocal();
+      resetCvImportPanel();
+      showActionStatus("CV-Vorschl\u00e4ge \u00fcbernommen.");
+    }
+
+    function cssValue(name, fallback) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+    }
+
+    function chartSvgStyles() {
+      const accent = cssValue("--accent", "#d1003d");
+      const accentSoft = cssValue("--accent-soft", "rgba(209, 0, 61, 0.1)");
+      const chartSurface = cssValue("--chart-surface", "#ffffff");
+      const ink = cssValue("--ink", "#1f0353");
+      const line = cssValue("--line", "#c9c2d5");
+      const muted = cssValue("--muted", "#66527e");
+      const strongLine = cssValue("--strong-line", "#66527e");
+
+      return `
+        .grid-ring { fill: none; stroke: ${line}; stroke-width: 1.2; }
+        .grid-ring.major { stroke: ${strongLine}; stroke-width: 1.4; }
+        .axis-line { stroke: ${line}; stroke-width: 1; }
+        .axis-label { fill: ${ink}; font-size: 19px; font-weight: 700; letter-spacing: 0; }
+        .level-label { fill: ${muted}; font-size: 11px; font-weight: 600; opacity: 0.86; }
+        .selected-level-label {
+          fill: ${accent};
+          font-size: 12px;
+          font-weight: 800;
+          opacity: 1;
+          paint-order: stroke;
+          stroke: ${chartSurface};
+          stroke-width: 5px;
+          stroke-linejoin: round;
+        }
+        .self-area { fill: ${accentSoft}; stroke: ${accent}; stroke-width: 4; stroke-linejoin: round; }
+        .self-point { fill: ${cssValue("--surface", "#f4f2f6")}; stroke: ${accent}; stroke-width: 3; }
+        text { font-family: Muli, Inter, Arial, sans-serif; }
+      `;
+    }
+
+    function chartViewBoxParts() {
+      return (svg.getAttribute("viewBox") || "-410 -360 820 720")
+        .split(/\s+/)
+        .map(Number);
+    }
+
+    function cloneCurrentChartSvg({ width = 1640, height = 1440 } = {}) {
+      const clone = svg.cloneNode(true);
+      const [viewX, viewY, viewWidth, viewHeight] = chartViewBoxParts();
+      const idPrefix = `radar-${Math.random().toString(36).slice(2)}`;
+      const title = clone.querySelector("title");
+      const desc = clone.querySelector("desc");
+
+      clone.removeAttribute("id");
+      clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      clone.setAttribute("width", String(width));
+      clone.setAttribute("height", String(height));
+      clone.setAttribute("viewBox", `${viewX} ${viewY} ${viewWidth} ${viewHeight}`);
+      clone.setAttribute("role", "img");
+
+      if (title) {
+        title.id = `${idPrefix}-title`;
+      }
+      if (desc) {
+        desc.id = `${idPrefix}-desc`;
+      }
+      if (title && desc) {
+        clone.setAttribute("aria-labelledby", `${title.id} ${desc.id}`);
+      }
+
+      const style = svgElement("style");
+      style.textContent = chartSvgStyles();
+      clone.insertBefore(style, clone.firstChild);
+
+      const background = svgElement("rect", {
+        x: viewX,
+        y: viewY,
+        width: viewWidth,
+        height: viewHeight,
+        fill: cssValue("--chart-surface", "#ffffff")
+      });
+      clone.insertBefore(background, style.nextSibling);
+
+      return clone;
+    }
+
+    function syncChartDialog(force = false) {
+      if (!force && !chartDialog.open) return;
+      chartDialogFrame.replaceChildren(cloneCurrentChartSvg());
+    }
+
+    async function downloadChartPng() {
+      const width = 1640;
+      const height = 1440;
+      const clonedSvg = cloneCurrentChartSvg({ width, height });
+      const serialized = new XMLSerializer().serializeToString(clonedSvg);
+      const svgBlob = new Blob([serialized], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+
+      try {
+        const image = new Image();
+        image.decoding = "async";
+        const imageLoaded = new Promise((resolve, reject) => {
+          image.onload = resolve;
+          image.onerror = reject;
+        });
+        image.src = svgUrl;
+        await imageLoaded;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        context.fillStyle = cssValue("--chart-surface", "#ffffff");
+        context.fillRect(0, 0, width, height);
+        context.drawImage(image, 0, 0, width, height);
+
+        const pngBlob = await new Promise((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error("PNG export failed"));
+            }
+          }, "image/png");
+        });
+
+        const downloadUrl = URL.createObjectURL(pngBlob);
+        const link = document.createElement("a");
+        const datePart = (state.profileDate || new Date().toISOString().slice(0, 10)).replace(/[^0-9a-z-]/gi, "-");
+        link.href = downloadUrl;
+        link.download = `developer-self-assessment-${datePart}.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(downloadUrl);
+        showActionStatus("PNG heruntergeladen.");
+      } catch (error) {
+        showActionStatus("PNG konnte nicht erstellt werden.");
+      } finally {
+        URL.revokeObjectURL(svgUrl);
+      }
+    }
+
+    function renderChart() {
+      svg.replaceChildren();
+      const title = svgElement("title", { id: "radarTitle" });
+      title.textContent = "Engineering Ladders Radar";
+      const desc = svgElement("desc", { id: "radarDesc" });
+      desc.textContent = "F\u00fcnf Achsen: Technology, System, People, Process, Influence.";
+      svg.append(title, desc);
+      const selectedLevelLabels = [];
+
+      for (let ring = 1; ring <= 5; ring += 1) {
+        const polygon = svgElement("polygon", {
+          points: pointsFor(Object.fromEntries(axes.map((axis) => [axis.id, ring]))),
+          class: ring === 5 ? "grid-ring major" : "grid-ring"
+        });
+        svg.appendChild(polygon);
+      }
+
+      axes.forEach((axis, index) => {
+        const outer = pointFor(index, 5);
+        svg.appendChild(svgElement("line", {
+          x1: 0,
+          y1: 0,
+          x2: outer.x,
+          y2: outer.y,
+          class: "axis-line"
+        }));
+
+        const labelPoint = pointFor(index, 5.62);
+        const label = svgElement("text", {
+          x: labelPoint.x,
+          y: labelPoint.y,
+          class: "axis-label",
+          "text-anchor": labelPoint.x < -20 ? "end" : labelPoint.x > 20 ? "start" : "middle",
+          "dominant-baseline": "middle"
+        });
+        label.textContent = axis.label;
+        svg.appendChild(label);
+
+        axis.levels.forEach((_, levelIndex) => {
+          if (levelIndex + 1 === state.values[axis.id]) {
+            selectedLevelLabels.push({ axis, index, levelIndex });
+            return;
+          }
+          renderLevelLabel(axis, index, levelIndex);
+        });
+      });
+
+      svg.appendChild(svgElement("polygon", {
+        points: pointsFor(state.values),
+        class: "self-area"
+      }));
+
+      axes.forEach((axis, index) => {
+        const point = pointFor(index, state.values[axis.id]);
+        svg.appendChild(svgElement("circle", {
+          cx: point.x,
+          cy: point.y,
+          r: 6,
+          class: "self-point"
+        }));
+      });
+
+      selectedLevelLabels.forEach(({ axis, index, levelIndex }) => {
+        renderLevelLabel(axis, index, levelIndex, true);
+      });
+
+      syncChartDialog();
+    }
+
+    function renderControls() {
+      axisControls.replaceChildren();
+      axes.forEach((axis) => {
+        const section = document.createElement("section");
+        section.className = "axis-control";
+
+        const levelName = levelNameFor(axis, state.values[axis.id]);
+        section.innerHTML = `
+          <div class="axis-topline">
+            <label class="axis-name" for="${axis.id}">${axis.label}</label>
+            <span class="axis-level" id="${axis.id}-level">${levelName}</span>
+          </div>
+          <div class="range-row">
+            <input id="${axis.id}" name="${axis.id}" type="range" min="0" max="5" step="1" value="${state.values[axis.id]}">
+            <output for="${axis.id}" id="${axis.id}-value">${state.values[axis.id]}</output>
+          </div>
+          <div class="scale" aria-hidden="true">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+          </div>
+          <label class="field-label" for="${axis.id}-notes">Belege / Beispiele</label>
+          <textarea id="${axis.id}-notes" name="${axis.id}-notes" placeholder="Konkrete Beispiele f&uuml;r das Gespr&auml;ch">${escapeHtml(state.notes[axis.id] || "")}</textarea>
+        `;
+
+        const input = section.querySelector(`#${axis.id}`);
+        const notes = section.querySelector(`#${axis.id}-notes`);
+        input.addEventListener("input", (event) => {
+          state.values[axis.id] = Number(event.target.value);
+          section.querySelector(`#${axis.id}-value`).textContent = state.values[axis.id];
+          section.querySelector(`#${axis.id}-level`).textContent = levelNameFor(axis, state.values[axis.id]);
+          renderChart();
+          renderContext();
+          saveLocal();
+        });
+        notes.addEventListener("input", (event) => {
+          state.notes[axis.id] = event.target.value;
+          renderContext();
+          saveLocal();
+        });
+        axisControls.appendChild(section);
+      });
+    }
+
+    function renderContext() {
+      contextGrid.replaceChildren();
+      axes.forEach((axis) => {
+        const item = document.createElement("article");
+        item.className = "context-item";
+        const selfValue = state.values[axis.id];
+        const selfLevel = levelNameFor(axis, selfValue);
+        const sourceDefinition = definitionFor(axis, selfValue);
+        const definitionHtml = sourceDefinition
+          ? `<p class="context-definition"><strong>${sourceDefinition.label}:</strong> ${sourceDefinition.copy}</p>`
+          : `<p class="context-definition"><strong>Nicht bewertet:</strong> keine Level-Definition ausgew&auml;hlt.</p>`;
+        const note = state.notes[axis.id] || "";
+        const contextCopy = note.trim() ? escapeHtml(note) : "Noch keine Belege erfasst.";
+        item.innerHTML = `
+          <p class="context-title">${axis.label}</p>
+          <p class="context-value">Ich: ${selfValue} ${selfLevel}</p>
+          ${definitionHtml}
+          <p class="context-copy"><span class="context-copy-label">Einsch&auml;tzung:</span> ${contextCopy}</p>
+        `;
+        contextGrid.appendChild(item);
+      });
+
+      const valueSummary = axes
+        .map((axis) => `${axis.label}: ${state.values[axis.id]} ${levelNameFor(axis, state.values[axis.id])}`)
+        .join(" / ");
+      printSummary.textContent = `${state.profileName}, ${state.profileDate}: ${valueSummary}`;
+    }
+
+    function saveLocal() {
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(state));
+      } catch (error) {
+        // Local storage is optional; the chart remains usable without it.
+      }
+    }
+
+    function loadLocal() {
+      try {
+        const saved = JSON.parse(window.localStorage.getItem(storageKey) || "null");
+        if (!saved) return;
+        applyAssessmentState(saved);
+      } catch (error) {
+        window.localStorage.removeItem(storageKey);
+      }
+    }
+
+    function loadSharedState() {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const encodedState = params.get("state");
+      if (!encodedState) return false;
+
+      try {
+        applyAssessmentState(decodeAssessmentState(encodedState));
+        return true;
+      } catch (error) {
+        const url = new URL(window.location.href);
+        url.hash = "";
+        window.history.replaceState(null, "", url);
+        showActionStatus("Geteilte URL konnte nicht gelesen werden.");
+        return false;
+      }
+    }
+
+    function loadQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const values = params.get("values");
+      if (values) {
+        values.split(",").forEach((rawValue, index) => {
+          const axis = axes[index];
+          const value = Number(rawValue);
+          if (axis && Number.isInteger(value)) {
+            state.values[axis.id] = clampAssessmentValue(value);
+          }
+        });
+      }
+      if (params.get("profile")) {
+        state.profileName = params.get("profile");
+      }
+      if (params.get("date")) {
+        state.profileDate = params.get("date");
+      }
+    }
+
+    function syncProfileFields() {
+      profileName.value = state.profileName;
+      profileDate.value = state.profileDate;
+    }
+
+    function buildShareUrl() {
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.hash = `state=${encodeAssessmentState()}`;
+      return url;
+    }
+
+    function clearSharedUrl() {
+      if (!window.location.hash) return;
+      const url = new URL(window.location.href);
+      url.hash = "";
+      window.history.replaceState(null, "", url);
+    }
+
+    document.getElementById("shareButton").addEventListener("click", async () => {
+      const url = buildShareUrl();
+      window.history.replaceState(null, "", url);
+      try {
+        await navigator.clipboard.writeText(url.toString());
+        showActionStatus("URL mit vollst\u00e4ndiger Einsch\u00e4tzung kopiert.");
+      } catch (error) {
+        // Clipboard access is not required; the address bar still contains the URL.
+        showActionStatus("URL mit vollst\u00e4ndiger Einsch\u00e4tzung aktualisiert.");
+      }
+    });
+
+    moreActions?.addEventListener("click", (event) => {
+      if (event.target.closest("button")) {
+        closeMoreActions();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (moreActions?.open && !moreActions.contains(event.target)) {
+        closeMoreActions();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeMoreActions();
+      }
+    });
+
+    chartFullViewButton.addEventListener("click", () => {
+      syncChartDialog(true);
+      if (typeof chartDialog.showModal === "function") {
+        chartDialog.showModal();
+      } else {
+        chartDialog.setAttribute("open", "");
+      }
+    });
+
+    chartDialogCloseButton.addEventListener("click", () => {
+      chartDialog.close();
+    });
+
+    chartDialog.addEventListener("click", (event) => {
+      if (event.target === chartDialog) {
+        chartDialog.close();
+      }
+    });
+
+    chartDownloadButton.addEventListener("click", downloadChartPng);
+    chartDialogDownloadButton.addEventListener("click", downloadChartPng);
+
+    helpButton.addEventListener("click", () => {
+      closeMoreActions();
+      if (typeof helpDialog.showModal === "function") {
+        helpDialog.showModal();
+      } else {
+        helpDialog.setAttribute("open", "");
+      }
+    });
+
+    helpCloseButton.addEventListener("click", () => {
+      helpDialog.close();
+    });
+
+    helpDialog.addEventListener("click", (event) => {
+      if (event.target === helpDialog) {
+        helpDialog.close();
+      }
+    });
+
+    privacyButton.addEventListener("click", () => {
+      if (typeof privacyDialog.showModal === "function") {
+        privacyDialog.showModal();
+      } else {
+        privacyDialog.setAttribute("open", "");
+      }
+    });
+
+    privacyCloseButton.addEventListener("click", () => {
+      privacyDialog.close();
+    });
+
+    privacyDialog.addEventListener("click", (event) => {
+      if (event.target === privacyDialog) {
+        privacyDialog.close();
+      }
+    });
+
+    document.getElementById("printButton").addEventListener("click", () => window.print());
+
+    exportButton.addEventListener("click", () => {
+      const json = JSON.stringify(getAssessmentState(), null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const datePart = (state.profileDate || new Date().toISOString().slice(0, 10)).replace(/[^0-9a-z-]/gi, "-");
+      link.href = url;
+      link.download = `self-assessment-${datePart}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showActionStatus("JSON exportiert.");
+    });
+
+    importButton.addEventListener("click", () => {
+      importInput.click();
+    });
+
+    importInput.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const importedState = JSON.parse(await file.text());
+        applyAssessmentState(importedState);
+        clearSharedUrl();
+        resetCvImportPanel();
+        render();
+        saveLocal();
+        showActionStatus("JSON importiert.");
+      } catch (error) {
+        showActionStatus("JSON konnte nicht importiert werden.");
+      } finally {
+        importInput.value = "";
+      }
+    });
+
+    cvImportButton.addEventListener("click", () => {
+      cvInput.click();
+    });
+
+    cvSuggestions.addEventListener("click", (event) => {
+      const button = event.target.closest(".cv-term-button");
+      if (!button) return;
+      removeCvTerm(button.dataset.axisId, Number(button.dataset.termIndex));
+    });
+
+    cvInput.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      cvImportState = {
+        characterCount: null,
+        fileName: file.name,
+        stateLabel: "Lokal",
+        status: "PDF wird lokal im Browser gelesen. Es wird nichts hochgeladen.",
+        suggestions: []
+      };
+      renderCvPanel();
+
+      if (file.type && file.type !== "application/pdf") {
+        cvImportState.status = "Bitte eine PDF-Datei ausw\u00e4hlen.";
+        cvImportState.stateLabel = "Fehler";
+        renderCvPanel();
+        cvInput.value = "";
+        return;
+      }
+
+      try {
+        const text = await extractTextFromPdf(file);
+        cvImportState.characterCount = text.length;
+
+        if (text.length < 250) {
+          cvImportState.status = "PDF konnte nicht ausreichend gelesen werden. Bitte Belege manuell eintragen.";
+          cvImportState.stateLabel = "Zu wenig Text";
+          cvImportState.suggestions = [];
+          renderCvPanel();
+          return;
+        }
+
+        cvImportState.status = "PDF wurde lokal analysiert. Bitte Vorschl\u00e4ge pr\u00fcfen; einzelne Begriffe kannst du mit X entfernen.";
+        cvImportState.stateLabel = "Bereit";
+        cvImportState.suggestions = analyzeCvText(text);
+        renderCvPanel();
+        showActionStatus("CV-Vorschl\u00e4ge erstellt.");
+      } catch (error) {
+        cvImportState.characterCount = null;
+        cvImportState.status = "PDF konnte nicht gelesen werden. Bitte Belege manuell eintragen.";
+        cvImportState.stateLabel = "Fehler";
+        cvImportState.suggestions = [];
+        renderCvPanel();
+      } finally {
+        cvInput.value = "";
+      }
+    });
+
+    cvApplyButton.addEventListener("click", applyCvSuggestions);
+
+    cvDiscardButton.addEventListener("click", () => {
+      resetCvImportPanel();
+      showActionStatus("CV-Vorschl\u00e4ge verworfen.");
+    });
+
+    function showActionStatus(message) {
+      window.clearTimeout(actionStatusTimer);
+      actionStatus.textContent = message;
+      actionStatusTimer = window.setTimeout(() => {
+        actionStatus.textContent = "";
+      }, 2600);
+    }
+
+    resetButton.addEventListener("click", () => {
+      axes.forEach((axis) => {
+        state.values[axis.id] = 0;
+        state.notes[axis.id] = "";
+      });
+      state.profileName = "";
+      state.profileDate = new Date().toISOString().slice(0, 10);
+      clearSharedUrl();
+      resetCvImportPanel();
+      render();
+      saveLocal();
+      showActionStatus("Einsch\u00e4tzung zur\u00fcckgesetzt.");
+    });
+
+    profileName.addEventListener("input", (event) => {
+      state.profileName = event.target.value;
+      renderContext();
+      saveLocal();
+    });
+
+    profileDate.addEventListener("input", (event) => {
+      state.profileDate = event.target.value;
+      renderContext();
+      saveLocal();
+    });
+
+    function render() {
+      syncProfileFields();
+      renderChart();
+      renderControls();
+      renderContext();
+    }
+
+    loadLocal();
+    const loadedSharedState = loadSharedState();
+    if (!loadedSharedState) {
+      loadQuery();
+    }
+    render();
+    if (loadedSharedState) {
+      saveLocal();
+    }
+  </script>
+</body>
+</html>

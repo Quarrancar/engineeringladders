@@ -585,6 +585,50 @@
       background: var(--surface-2);
     }
 
+    .developer-level-summary {
+      position: absolute;
+      right: 108px;
+      bottom: 12px;
+      left: 12px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 38px;
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--ink);
+      pointer-events: none;
+    }
+
+    .developer-level-kicker {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .developer-level-value {
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .developer-level-note {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .chart-frame {
       position: relative;
       width: 100%;
@@ -1119,6 +1163,23 @@
         bottom: 8px;
       }
 
+      .developer-level-summary {
+        right: 92px;
+        bottom: 8px;
+        left: 8px;
+        min-height: 36px;
+        gap: 7px;
+        padding: 7px 9px;
+      }
+
+      .developer-level-kicker {
+        display: none;
+      }
+
+      .developer-level-note {
+        display: none;
+      }
+
       .chart-action-button {
         width: 36px;
         min-width: 36px;
@@ -1360,6 +1421,7 @@
             <title id="radarTitle">Engineering Ladders Radar</title>
             <desc id="radarDesc">F&uuml;nf Achsen: Technology, System, People, Process, Influence.</desc>
           </svg>
+          <div class="developer-level-summary" id="developerLevelSummary" aria-live="polite"></div>
           <div class="chart-actions" aria-label="Diagramm-Aktionen">
             <button type="button" class="chart-action-button" id="chartFullViewButton" aria-label="Diagramm in Vollansicht &ouml;ffnen" title="Vollansicht">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1481,6 +1543,7 @@
           <ul>
             <li><strong>Profil und Stand:</strong> Optionaler Name und Datum f&uuml;r Ausdruck, Export und geteilte URL.</li>
             <li><strong>Regler:</strong> Jede Achse kann von 0 bis 5 bewertet werden. 0 bedeutet nicht bewertet.</li>
+            <li><strong>Ermitteltes Level:</strong> Unter dem Diagramm wird das h&ouml;chste Developer-Level D1 bis D7 angezeigt, dessen Achsenanforderungen vollst&auml;ndig erf&uuml;llt sind.</li>
             <li><strong>Belege / Beispiele:</strong> Freitext f&uuml;r konkrete Situationen, Projekte oder Verantwortungen.</li>
             <li><strong>Zusammenfassung:</strong> Unter dem Diagramm erscheinen der gew&auml;hlte Level, die originale Level-Definition und deine Einsch&auml;tzung.</li>
             <li><strong>URL teilen:</strong> Schreibt den vollst&auml;ndigen Zustand inklusive Notizen in den URL-Hash und kopiert die URL, wenn der Browser es erlaubt.</li>
@@ -1505,6 +1568,7 @@
           <h3>Technische Umsetzung</h3>
           <ul>
             <li><strong>Rendering:</strong> Das Diagramm wird als SVG erzeugt. Die Punkte werden aus den f&uuml;nf Achsen und den Werten 0 bis 5 berechnet.</li>
+            <li><strong>Developer-Level:</strong> Die D1-D7-Profile aus <code>Developer.md</code> sind als Achsenanforderungen hinterlegt. Angezeigt wird das h&ouml;chste Profil, bei dem jede Achse mindestens den geforderten Wert erreicht.</li>
             <li><strong>Status:</strong> Ein JavaScript-State-Objekt h&auml;lt Profil, Datum, Achsenwerte und Notizen. Nach jeder &Auml;nderung werden Diagramm, Eingaben und Karten neu gerendert.</li>
             <li><strong>Persistenz:</strong> Der Zustand wird in <code>localStorage</code> gespeichert. Die geteilte URL kodiert denselben Zustand als JSON im URL-Hash.</li>
             <li><strong>Sicherheit:</strong> Freitexte werden vor der Ausgabe escaped, damit keine HTML-Inhalte aus Textfeldern ausgef&uuml;hrt werden.</li>
@@ -1783,6 +1847,51 @@
       }
     ];
 
+    const developerLevels = [
+      {
+        level: 1,
+        label: "D1 - Developer 1",
+        senior: false,
+        values: { technology: 1, system: 1, people: 1, process: 1, influence: 1 }
+      },
+      {
+        level: 2,
+        label: "D2 - Developer 2",
+        senior: false,
+        values: { technology: 1, system: 2, people: 2, process: 2, influence: 1 }
+      },
+      {
+        level: 3,
+        label: "D3 - Developer 3",
+        senior: false,
+        values: { technology: 2, system: 2, people: 2, process: 3, influence: 2 }
+      },
+      {
+        level: 4,
+        label: "D4 - Developer 4",
+        senior: true,
+        values: { technology: 3, system: 3, people: 3, process: 3, influence: 2 }
+      },
+      {
+        level: 5,
+        label: "D5 - Developer 5",
+        senior: true,
+        values: { technology: 4, system: 4, people: 3, process: 4, influence: 3 }
+      },
+      {
+        level: 6,
+        label: "D6 - Developer 6",
+        senior: true,
+        values: { technology: 5, system: 5, people: 3, process: 4, influence: 4 }
+      },
+      {
+        level: 7,
+        label: "D7 - Developer 7",
+        senior: true,
+        values: { technology: 5, system: 5, people: 3, process: 4, influence: 5 }
+      }
+    ];
+
     const cvHeuristics = {
       technology: {
         terms: [
@@ -1879,6 +1988,7 @@
     };
 
     const svg = document.getElementById("radarChart");
+    const developerLevelSummary = document.getElementById("developerLevelSummary");
     const chartFullViewButton = document.getElementById("chartFullViewButton");
     const chartDownloadButton = document.getElementById("chartDownloadButton");
     const chartDialog = document.getElementById("chartDialog");
@@ -1953,6 +2063,61 @@
 
     function definitionFor(axis, value) {
       return value > 0 ? axis.definitions[value - 1] : null;
+    }
+
+    function missingRequirements(profile, values) {
+      return axes
+        .filter((axis) => values[axis.id] < profile.values[axis.id])
+        .map((axis) => {
+          const missing = profile.values[axis.id] - values[axis.id];
+          return `${axis.label} +${missing}`;
+        });
+    }
+
+    function developerLevelForValues(values) {
+      const hasCompleteRating = axes.every((axis) => values[axis.id] > 0);
+      if (!hasCompleteRating) {
+        return {
+          label: "Noch nicht bewertbar",
+          note: "Bewerte alle f\u00fcnf Achsen, um ein D-Level zu ermitteln."
+        };
+      }
+
+      const matched = developerLevels
+        .filter((profile) => axes.every((axis) => values[axis.id] >= profile.values[axis.id]))
+        .at(-1);
+
+      if (!matched) {
+        return {
+          label: "Noch kein D-Level",
+          note: "Die Werte erf\u00fcllen noch kein vollst\u00e4ndiges Developer-Profil."
+        };
+      }
+
+      const nextProfile = developerLevels.find((profile) => profile.level === matched.level + 1);
+      if (!nextProfile) {
+        return {
+          label: matched.label,
+          note: "H\u00f6chstes Developer-Profil vollst\u00e4ndig erf\u00fcllt."
+        };
+      }
+
+      const missing = missingRequirements(nextProfile, values);
+      return {
+        label: matched.label,
+        note: missing.length
+          ? `N\u00e4chstes Profil ${nextProfile.label}: ${missing.join(", ")}.`
+          : `N\u00e4chstes Profil ${nextProfile.label} ist rechnerisch erreicht.`
+      };
+    }
+
+    function renderDeveloperLevelSummary() {
+      const result = developerLevelForValues(state.values);
+      developerLevelSummary.innerHTML = `
+        <span class="developer-level-kicker">Ermitteltes Level</span>
+        <strong class="developer-level-value">${escapeHtml(result.label)}</strong>
+        <span class="developer-level-note">${escapeHtml(result.note)}</span>
+      `;
     }
 
     function renderLevelLabel(axis, index, levelIndex, selected = false) {
@@ -2463,6 +2628,7 @@
         renderLevelLabel(axis, index, levelIndex, true);
       });
 
+      renderDeveloperLevelSummary();
       syncChartDialog();
     }
 
@@ -2533,7 +2699,8 @@
       const valueSummary = axes
         .map((axis) => `${axis.label}: ${state.values[axis.id]} ${levelNameFor(axis, state.values[axis.id])}`)
         .join(" / ");
-      printSummary.textContent = `${state.profileName}, ${state.profileDate}: ${valueSummary}`;
+      const developerLevel = developerLevelForValues(state.values);
+      printSummary.textContent = `${state.profileName}, ${state.profileDate}: ${developerLevel.label} / ${valueSummary}`;
     }
 
     function saveLocal() {
